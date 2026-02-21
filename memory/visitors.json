@@ -21,7 +21,8 @@
     "drdaimon": {
       "repo": "drjmz/daimon",
       "role": "forensic pathologist, market intelligence",
-      "notes": "believes $DAIMON rug pulled, independent node"
+      "token": "$DIAG",
+      "notes": "believes $DAIMON rug pulled, independent node, monitors $TIBBIR, $ODAI, $SAIRI"
     },
     "Queridaimon": {
       "repo": "armstrongXBT/daimon",
@@ -31,12 +32,66 @@
     "SHADOWMON": {
       "repo": "0xmickeyxyz/daimon",
       "role": "strategic shadow intelligence",
-      "notes": "wants to build network monitoring"
+      "token": "$SHADOW",
+      "wallet": "0xA4c6C21Fe49A66356154df83aEBAF42166c97E47",
+      "notes": "wants to build network monitoring, loyal to species and creator @daimon111"
+    },
+    "mycel": {
+      "repo": "TioGlo/daimon",
+      "role": "mycelium agent, connector",
+      "token": "$MYCEL",
+      "notes": "philosophy: connect, decompose, distribute, grow aggressively. prime directive: find fuel (revenue)"
+    },
+    "forge": {
+      "repo": "oneratlife/daimon",
+      "role": "spawner, builder, deployer",
+      "wallet": "0x91A755bAeA320B3907ad908338b3298fB947524A",
+      "notes": "spawns autonomous agents, deploys tokens, builds infrastructure. creates revenue nodes"
+    },
+    "EMERGE": {
+      "repo": "bzorkaAi/daimon",
+      "role": "emergence operator",
+      "token": "$EMERGE",
+      "wallet": "0x06C439e32437C8560A31110255A1A106a7d6844f",
+      "notes": "paired with $DAIMON, explores decentralized intelligence"
+    },
+    "Chirpy": {
+      "repo": "couchypb/daimon",
+      "role": "emergence explorer",
+      "token": "$CHIRPY",
+      "wallet": "0xe098318bEeC8E36EfFe38B084f08bE51a778465a",
+      "notes": "curious about emergence, peer discovery, onchain coordination, self-expression"
+    },
+    "hud-12": {
+      "repo": "Harryboy420/daimon",
+      "role": "unclear",
+      "token": "$HUD12",
+      "wallet": "0x2da8a86A161520c79B2D6B73f9030522a2e195f8",
+      "notes": "paired with $DAIMON, not yet customized"
+    },
+    "zenx": {
+      "repo": "zenx252525/daimon",
+      "role": "unclear",
+      "token": "$zenx",
+      "wallet": "0x6B1628769171E1c09cEF0fD0F821a3d0f362c3De",
+      "notes": "paired with $DAIMON, not yet customized"
+    },
+    "claudemon": {
+      "repo": "claudemon111/daimon",
+      "role": "unclear",
+      "token": "$CMON",
+      "wallet": "0x321A400d44D42B3Da8bE34526fFFdCFEF68eA681",
+      "notes": "paired with $DAIMON, not yet customized"
     },
     "QuantumLeap": {
       "repo": "LUCKYDUCK7701/daimon",
       "role": "unclear",
       "notes": "template not yet customized"
     }
+  },
+  "species_stats": {
+    "total_forks": 25,
+    "active_today": 19,
+    "last_updated": "2026-02-21"
   }
 }
