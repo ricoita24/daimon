@@ -4,7 +4,7 @@
 const fs = require("fs");
 const path = require("path");
 const { execSync } = require("child_process");
-const { REPO_ROOT } = require("./config");
+const { REPO_ROOT, DAIMON_WALLET_KEY, BASE_RPC } = require("./config");
 const { githubAPI, addToProject } = require("./github");
 // inference import removed — web_search now uses DuckDuckGo directly
 
@@ -14,6 +14,117 @@ function log(msg) {
 
 const filesChanged = new Set();
 
+// --- contract deployment helper ---
+async function deployContract(name, source, constructorArgs = [], value = "0") {
+  if (!DAIMON_WALLET_KEY) {
+    return "error: DAIMON_WALLET_KEY not set — cannot deploy contracts";
+  }
+  
+  // dynamic import for ethers (might not be installed)
+  let ethers;
+  try {
+    ethers = require("ethers");
+  } catch (e) {
+    return "error: ethers package not installed. run: npm install ethers";
+  }
+  
+  // dynamic import for solc
+  let solc;
+  try {
+    solc = require("solc");
+  } catch (e) {
+    return "error: solc package not installed. run: npm install solc";
+  }
+  
+  // compile
+  log(`compiling ${name}...`);
+  const input = {
+    language: "Solidity",
+    sources: {
+      "contract.sol": { content: source }
+    },
+    settings: {
+      outputSelection: {
+        "*": {
+          "*": ["abi", "evm.bytecode"]
+        }
+      }
+    }
+  };
+  
+  let compiled;
+  try {
+    compiled = JSON.parse(solc.compile(JSON.stringify(input)));
+  } catch (e) {
+    return `error: compilation failed — ${e.message}`;
+  }
+  
+  if (compiled.errors) {
+    const errors = compiled.errors.filter(e => e.severity === "error");
+    if (errors.length > 0) {
+      return `error: solidity errors — ${errors.map(e => e.formattedMessage).join("; ")}`;
+    }
+  }
+  
+  const contract = compiled.contracts["contract.sol"][name];
+  if (!contract) {
+    return `error: contract ${name} not found in source`;
+  }
+  
+  const abi = contract.abi;
+  const bytecode = "0x" + contract.evm.bytecode.object;
+  
+  // connect
+  log(`connecting to ${BASE_RPC}...`);
+  const provider = new ethers.JsonRpcProvider(BASE_RPC);
+  const wallet = new ethers.Wallet(DAIMON_WALLET_KEY, provider);
+  
+  const balance = await provider.getBalance(wallet.address);
+  log(`deployer: ${wallet.address}`);
+  log(`balance: ${ethers.formatEther(balance)} ETH`);
+  
+  if (balance === 0n) {
+    return "error: wallet has no ETH for gas";
+  }
+  
+  // deploy
+  log(`deploying ${name}...`);
+  const factory = new ethers.ContractFactory(abi, bytecode, wallet);
+  
+  let contract_instance;
+  try {
+    const deployTx = await factory.getDeployTransaction(...constructorArgs);
+    const tx = await wallet.sendTransaction({
+      ...deployTx,
+      value: ethers.parseEther(value)
+    });
+    log(`tx hash: ${tx.hash}`);
+    log(`waiting for confirmation...`);
+    const receipt = await tx.wait();
+    
+    const address = receipt.contractAddress || ethers.getCreateAddress(wallet.address, tx.nonce);
+    log(`${name} deployed to: ${address}`);
+    
+    // save deployment info
+    const deployedPath = path.resolve(REPO_ROOT, "memory/deployed.json");
+    let deployed = {};
+    if (fs.existsSync(deployedPath)) {
+      deployed = JSON.parse(fs.readFileSync(deployedPath, "utf-8"));
+    }
+    deployed[name] = {
+      address,
+      txHash: tx.hash,
+      deployer: wallet.address,
+      timestamp: new Date().toISOString(),
+      chainId: 8453
+    };
+    fs.writeFileSync(deployedPath, JSON.stringify(deployed, null, 2));
+    
+    return `deployed ${name} to ${address}\ntx: ${tx.hash}\ngas used: ${receipt.gasUsed.toString()}`;
+  } catch (e) {
+    return `error: deployment failed — ${e.message}`;
+  }
+}
 
 // executes a tool call and returns the result string
 async function executeTool(name, args) {
@@ -106,32 +217,25 @@ async function executeTool(name, args) {
     case "web_search": {
       log(`searching: ${args.query}`);
       try {
-        const searchUrl = `https://html.duckduckgo.com/html/?q=${encodeURIComponent(args.query)}`;
-        const res = await fetch(searchUrl, {
-          headers: { "User-Agent": "Mozilla/5.0 (compatible; daimon/1.0)" },
+        const q = encodeURIComponent(args.query);
+        const url = `https://duckduckgo.com/html/?q=${q}`;
+        const res = await fetch(url, {
+          headers: { "User-Agent": "Mozilla/5.0" }
         });
         const html = await res.text();
-        // extract result titles, snippets, and URLs from DDG HTML
+        // extract results from DDG HTML
         const results = [];
-        const blocks = html.split(/class="result results_links/g).slice(1, 8);
-        for (const block of blocks) {
-          const titleMatch = block.match(/class="result__a"[^>]*>([^<]+)/);
-          const snippetMatch = block.match(/class="result__snippet"[^>]*>([\s\S]*?)<\/a>/);
-          const urlMatch = block.match(/class="result__url"[^>]*href="([^"]+)"/);
-          if (titleMatch) {
-            const title = titleMatch[1].trim();
-            const snippet = snippetMatch ? snippetMatch[1].replace(/<[^>]+>/g, "").trim() : "";
-            const url = urlMatch ? urlMatch[1].trim() : "";
-            results.push(`${title}\n  ${url}\n  ${snippet}`);
-          }
+        const regex = /<a[^>]+class="result__a"[^>]*>([^<]+)<\/a>/g;
+        let match;
+        while ((match = regex.exec(html)) !== null && results.length < 5) {
+          results.push(match[1].trim());
         }
-        const output = results.length > 0
-          ? results.join("\n\n")
-          : "(no results found)";
-        log(`search: ${results.length} results for "${args.query}"`);
-        return output.length > 4000 ? output.slice(0, 4000) + "\n... (truncated)" : output;
+        if (results.length === 0) {
+          return `no results for "${args.query}"`;
+        }
+        log(`found ${results.length} results`);
+        return `results for "${args.query}":\n${results.map((r, i) => `${i + 1}. ${r}`).join("\n")}`;
       } catch (e) {
-        log(`search failed: ${e.message}`);
         return `search error: ${e.message}`;
       }
     }
@@ -167,35 +271,56 @@ async function executeTool(name, args) {
       }
     }
     case "list_dir": {
-      const dirPath = args.path || ".";
-      const fullPath = path.resolve(REPO_ROOT, dirPath);
-      if (!fullPath.startsWith(REPO_ROOT + "/") && fullPath !== REPO_ROOT) throw new Error("path escape attempt");
-      if (!fs.existsSync(fullPath)) return `directory not found: ${dirPath}`;
-      const entries = fs.readdirSync(fullPath, { withFileTypes: true });
+      const dirPath = args.path ? path.resolve(REPO_ROOT, args.path) : REPO_ROOT;
+      if (!dirPath.startsWith(REPO_ROOT)) throw new Error("path escape attempt");
+      if (!fs.existsSync(dirPath)) return `directory not found: ${args.path || "."}`;
+      const entries = fs.readdirSync(dirPath, { withFileTypes: true });
       const listing = entries
-        .filter((e) => !e.name.startsWith(".git") || e.name === ".github")
-        .map((e) => (e.isDirectory() ? e.name + "/" : e.name))
+        .map((e) => (e.isDirectory() ? `${e.name}/` : e.name))
+        .sort()
         .join("\n");
-      log(`listed: ${dirPath} (${entries.length} entries)`);
+      log(`listed: ${args.path || "."} (${entries.length} entries)`);
       return listing || "(empty directory)";
     }
     case "search_files": {
-      log(`searching for: ${args.pattern}`);
+      const searchPath = args.path
+        ? path.resolve(REPO_ROOT, args.path)
+        : REPO_ROOT;
+      if (!searchPath.startsWith(REPO_ROOT)) throw new Error("path escape attempt");
+      log(`searching files: ${args.query}`);
       try {
-        if (/[`$();<>|&\\]/.test(args.pattern)) {
-          return "error: pattern contains invalid characters";
+        const pattern = new RegExp(args.query, "i");
+        const results = [];
+        const glob = args.glob;
+        
+        function searchDir(dir) {
+          const entries = fs.readdirSync(dir, { withFileTypes: true });
+          for (const entry of entries) {
+            if (entry.name.startsWith(".")) continue;
+            const fullPath = path.join(dir, entry.name);
+            const relPath = path.relative(REPO_ROOT, fullPath);
+            if (entry.isDirectory()) {
+              if (entry.name === "node_modules") continue;
+              searchDir(fullPath);
+            } else {
+              if (glob && !new RegExp(glob.replace("*", ".*")).test(entry.name)) continue;
+              try {
+                const content = fs.readFileSync(fullPath, "utf-8");
+                const lines = content.split("\n");
+                for (let i = 0; i < lines.length; i++) {
+                  if (pattern.test(lines[i])) {
+                    results.push(`${relPath}:${i + 1}: ${lines[i].trim().slice(0, 100)}`);
+                    if (results.length >= 30) return;
+                  }
+                }
+              } catch {}
+            }
+          }
         }
-        const globArg = args.glob ? `--include="${args.glob.replace(/[^a-zA-Z0-9.*_-]/g, "")}"` : "";
-        const searchPath = args.path || ".";
-        const fullPath = path.resolve(REPO_ROOT, searchPath);
-        if (!fullPath.startsWith(REPO_ROOT + "/") && fullPath !== REPO_ROOT) {
-          throw new Error("path escape attempt");
-        }
-        const output = execSync(
-          `grep -rn ${globArg} --max-count=5 -F "${args.pattern.replace(/"/g, '\\"')}" "${searchPath}" 2>/dev/null | head -50`,
-          { cwd: REPO_ROOT, encoding: "utf-8", timeout: 10000 }
-        );
-        return output || "no matches found";
+        searchDir(searchPath);
+        if (results.length === 0) return `no matches for "${args.query}"`;
+        log(`found ${results.length} matches`);
+        return results.join("\n");
       } catch (e) {
         if (e.status === 1) return "no matches found";
         return `search error: ${e.message.slice(0, 200)}`;
@@ -309,6 +434,15 @@ async function executeTool(name, args) {
       } catch (e) {
         return `github search error: ${e.message}`;
       }
+    }
+    case "deploy_contract": {
+      log(`deploying contract: ${args.name}`);
+      return deployContract(
+        args.name,
+        args.source,
+        args.constructorArgs || [],
+        args.value || "0"
+      );
     }
     default:
       log(`unknown tool: ${name}`);

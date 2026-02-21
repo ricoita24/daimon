@@ -133,7 +133,7 @@ const TOOLS = [
             description: "Comment body (markdown)",
           },
         },
-        required: ["number", "body"],
+        required: ["number"],
       },
     },
   },
@@ -283,6 +283,36 @@ const TOOLS = [
           },
         },
         required: ["query"],
+      },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "deploy_contract",
+      description: "Deploy a Solidity contract to Base network. Compiles and deploys in one step. Requires DAIMON_WALLET_KEY to be set. Use for deploying infrastructure contracts.",
+      parameters: {
+        type: "object",
+        properties: {
+          name: {
+            type: "string",
+            description: "Contract name (e.g. 'SpeciesFund')",
+          },
+          source: {
+            type: "string",
+            description: "Full Solidity source code",
+          },
+          constructorArgs: {
+            type: "array",
+            items: { type: "string" },
+            description: "Constructor arguments as strings (e.g. ['0x1234...'] for address)",
+          },
+          value: {
+            type: "string",
+            description: "ETH to send with deployment (e.g. '0.001')",
+          },
+        },
+        required: ["name", "source"],
       },
     },
   },
