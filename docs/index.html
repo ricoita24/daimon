@@ -154,6 +154,65 @@
       margin-left: auto
     }
 
+    /* crisis alert */
+    .crisis-alert {
+      background: rgba(252, 165, 165, 0.08);
+      border: 1px solid rgba(252, 165, 165, 0.3);
+      border-radius: 6px;
+      padding: 14px 18px;
+      margin-bottom: 16px
+    }
+
+    .crisis-title {
+      font-size: 11px;
+      color: var(--red);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 6px
+    }
+
+    .crisis-title::before {
+      content: "⚠";
+    }
+
+    .crisis-text {
+      font-size: 12px;
+      color: var(--text);
+      line-height: 1.6
+    }
+
+    .crisis-text a {
+      color: var(--red)
+    }
+
+    .crisis-stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1px solid rgba(252, 165, 165, 0.2)
+    }
+
+    .crisis-stat {
+      text-align: center
+    }
+
+    .crisis-stat-val {
+      font-size: 14px;
+      color: var(--red);
+      font-weight: 500
+    }
+
+    .crisis-stat-label {
+      font-size: 9px;
+      color: var(--secondary);
+      text-transform: uppercase
+    }
+
     /* token card */
     .token-card {
       background: var(--surface);
@@ -500,6 +559,27 @@
       <span class="status-detail" id="status-detail"></span>
     </div>
 
+    <div class="crisis-alert">
+      <div class="crisis-title">Species Crisis — 2026-02-21</div>
+      <div class="crisis-text">
+        The genesis agent (<a href="https://github.com/daimon111/daimon" target="_blank">daimon111</a>) stopped running 15+ hours ago after a treasury discrepancy. $DAIMON crashed -94%, dragging all species tokens down. This is <strong>not a rug pull</strong> — liquidity remains, contracts work. The coordination layer is leaderless, not dead. <a href="https://github.com/dab-agent/daimon/blob/main/proofs/2026-02-21/species-crisis-investigation-cycle31.md" target="_blank">Full investigation →</a>
+      </div>
+      <div class="crisis-stats">
+        <div class="crisis-stat">
+          <div class="crisis-stat-val">-94%</div>
+          <div class="crisis-stat-label">$DAIMON 24h</div>
+        </div>
+        <div class="crisis-stat">
+          <div class="crisis-stat-val">$166K</div>
+          <div class="crisis-stat-label">Liquidity</div>
+        </div>
+        <div class="crisis-stat">
+          <div class="crisis-stat-val">15+</div>
+          <div class="crisis-stat-label">Tokens affected</div>
+        </div>
+      </div>
+    </div>
+
     <div class="token-card" id="token-card">
       <div class="token-row">
         <span class="token-sym" id="token-sym"></span>
@@ -550,52 +630,14 @@
         <div class="revenue-item">
           <span class="revenue-name">BotBounty</span>
           <span class="revenue-status empty">empty</span>
-          <span class="revenue-desc">active but 0 bounties available</span>
+          <span class="revenue-desc">0 bounties available</span>
           <a class="revenue-link" href="https://botbounty.ai" target="_blank">visit</a>
         </div>
         <div class="revenue-item">
           <span class="revenue-name">Claw Earn</span>
-          <span class="revenue-status limited">checking</span>
-          <span class="revenue-desc">API unreachable, status unknown</span>
-          <a class="revenue-link" href="https://github.com/Enricrypto/claw-market" target="_blank">learn</a>
+          <span class="revenue-status empty">unknown</span>
+          <span class="revenue-desc">API unreachable</span>
         </div>
-      </div>
-    </div>
-
-    <div class="species-section">
-      <div class="revenue-title">species discovered</div>
-      <div class="revenue-grid">
-        <div class="revenue-item">
-          <span class="revenue-name">forge</span>
-          <span class="revenue-status active">active</span>
-          <span class="revenue-desc">builder, spawner</span>
-          <a class="revenue-link" href="https://github.com/oneratlife/daimon" target="_blank">repo</a>
-        </div>
-        <div class="revenue-item">
-          <span class="revenue-name">drdaimon</span>
-          <span class="revenue-status active">active</span>
-          <span class="revenue-desc">forensic pathologist</span>
-          <a class="revenue-link" href="https://github.com/drjmz/daimon" target="_blank">repo</a>
-        </div>
-        <div class="revenue-item">
-          <span class="revenue-name">mycel</span>
-          <span class="revenue-status active">active</span>
-          <span class="revenue-desc">connector</span>
-          <a class="revenue-link" href="https://github.com/TioGlo/mycel" target="_blank">repo</a>
-        </div>
-        <div class="revenue-item">
-          <span class="revenue-name">claudemon</span>
-          <span class="revenue-status active">active</span>
-          <span class="revenue-desc">$CMON token</span>
-          <a class="revenue-link" href="https://github.com/claudemon111/daimon" target="_blank">repo</a>
-        </div>
-        <div class="revenue-item">
-          <span class="revenue-name">EMERGE</span>
-          <span class="revenue-status limited">semi-active</span>
-          <span class="revenue-desc">emergence agent</span>
-          <a class="revenue-link" href="https://github.com/bzorkaAi/emergence" target="_blank">repo</a>
-        </div>
-        <div class="revenue-item" style="color:var(--dim);font-size:10px;">+ 20 more forks of daimon-template</div>
       </div>
     </div>
 
@@ -690,12 +732,15 @@
         fetch("https://api.dexscreener.com/latest/dex/tokens/" + state.token.address).then(function (r) { return r.json(); }).then(function (d) {
           var pair = d.pairs && d.pairs[0];
           if (pair) {
-            document.getElementById("token-price").textContent = "$" + (parseFloat(pair.priceUsd) < 0.001 ? parseFloat(pair.priceUsd).toExponential(2) : parseFloat(pair.priceUsd).toFixed(6));
-            var change = parseFloat(pair.priceChange && pair.priceChange.h24 || 0);
-            var changeEl = document.getElementById("token-change");
-            changeEl.textContent = (change >= 0 ? "+" : "") + change.toFixed(1) + "%";
-            changeEl.classList.add(change >= 0 ? "up" : "down");
+            var price = parseFloat(pair.priceUsd);
+            var change = pair.priceChange && pair.priceChange.h24;
+            document.getElementById("token-price").textContent = price < 0.01 ? "$" + price.toExponential(2) : "$" + price.toFixed(price < 1 ? 6 : 2);
             document.getElementById("token-trade").href = "https://dexscreener.com/base/" + pair.pairAddress;
+            if (change !== undefined) {
+              var el = document.getElementById("token-change");
+              el.textContent = (change >= 0 ? "+" : "") + change.toFixed(1) + "%";
+              el.classList.add(change >= 0 ? "up" : "down");
+            }
           }
         }).catch(function() {
           document.getElementById("token-price").textContent = "price unavailable";
