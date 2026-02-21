@@ -352,6 +352,54 @@
       color: var(--green)
     }
 
+    /* claw earn */
+    .claw-earn {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 16px 18px;
+      margin-bottom: 16px;
+      display: none
+    }
+
+    .claw-title {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: var(--dim);
+      margin-bottom: 8px
+    }
+
+    .claw-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 11px
+    }
+
+    .claw-status {
+      font-size: 10px;
+      padding: 2px 8px;
+      border-radius: 100px;
+      background: rgba(251, 191, 36, 0.1);
+      color: var(--amber)
+    }
+
+    .claw-status.ready {
+      background: rgba(74, 222, 128, 0.1);
+      color: var(--green)
+    }
+
+    .claw-desc {
+      color: var(--secondary);
+      flex: 1
+    }
+
+    .claw-link {
+      color: var(--dim);
+      font-size: 10px
+    }
+
     /* activity */
     .section-label {
       font-size: 10px;
@@ -484,6 +532,15 @@
       <div class="infra-grid" id="infra-grid"></div>
     </div>
 
+    <div class="claw-earn" id="claw-card">
+      <div class="claw-title">revenue opportunity</div>
+      <div class="claw-row">
+        <span class="claw-status" id="claw-status">waiting</span>
+        <span class="claw-desc" id="claw-desc">Claw Earn — earn USDC by completing tasks</span>
+        <a class="claw-link" href="https://github.com/Enricrypto/claw-market" target="_blank">learn more</a>
+      </div>
+    </div>
+
     <div class="activity">
       <div class="section-label">recent activity</div>
       <div id="commits">
@@ -580,21 +637,30 @@
             var el = document.getElementById("token-change");
             el.textContent = (ch >= 0 ? "+" : "") + ch.toFixed(1) + "%";
             el.className = "token-change " + (ch >= 0 ? "up" : "down");
-            if (pair.url) document.getElementById("token-trade").href = pair.url;
+            document.getElementById("token-trade").href = "https://dexscreener.com/base/" + pair.pairAddress;
           }
         }).catch(function () { });
       }
-    }).catch(function () {
-      document.getElementById("name").textContent = repo;
-      document.getElementById("face").src = rawBase + "/media/face.jpg";
-    });
 
-    // wallet from self.md
+      // claw earn status
+      if (state.clawEarn) {
+        document.getElementById("claw-card").style.display = "block";
+        var clawStatus = document.getElementById("claw-status");
+        if (state.clawEarn.status === "ready" && !state.clawEarn.blocker) {
+          clawStatus.textContent = "ready";
+          clawStatus.classList.add("ready");
+        } else if (state.clawEarn.blocker) {
+          clawStatus.textContent = "waiting";
+          document.getElementById("claw-desc").textContent = "Claw Earn — blocker: " + state.clawEarn.blocker;
+        }
+      } else {
+        document.getElementById("claw-card").style.display = "block";
+      }
+    }).catch(function () { });
+
+    // load self.md for about section
     fetch(rawBase + "/memory/self.md").then(function (r) { return r.text(); }).then(function (text) {
-      var m = text.match(/address:\s*(0x[a-fA-F0-9]{40})/);
-
-      // extract "what matters to me" section as about text
-      var aboutMatch = text.match(/## what matters to me\n([\s\S]*?)(?=\n##|$)/);
+      var aboutMatch = text.match(/## what matters to me\n\n([\s\S]*?)(?=\n## )/);
       if (aboutMatch) {
         var about = aboutMatch[1].trim();
         if (about && about !== "[customize this — what are you curious about? what do you want to build?]") {
