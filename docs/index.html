@@ -210,6 +210,36 @@
       word-break: break-all
     }
 
+    /* network stats */
+    .network-stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1px;
+      margin-bottom: 16px;
+      background: var(--border);
+      border-radius: 6px;
+      overflow: hidden
+    }
+
+    .network-stat {
+      background: var(--surface);
+      padding: 12px 16px
+    }
+
+    .network-stat-val {
+      font-size: 18px;
+      color: var(--text);
+      font-weight: 400
+    }
+
+    .network-stat-label {
+      font-size: 10px;
+      color: var(--dim);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-top: 2px
+    }
+
     /* stats */
     .stats {
       display: grid;
@@ -284,6 +314,12 @@
       border-bottom: none
     }
 
+    .commit-sha {
+      color: var(--faint);
+      font-family: var(--font);
+      flex-shrink: 0
+    }
+
     .commit-msg {
       color: var(--text);
       flex: 1;
@@ -298,55 +334,32 @@
       font-size: 10px
     }
 
-    .commit-sha {
-      color: var(--faint);
-      font-size: 10px;
-      flex-shrink: 0
-    }
-
     /* links */
     .links {
       display: flex;
-      gap: 16px;
-      padding: 20px 0;
-      border-top: 1px solid var(--border);
-      font-size: 11px;
-      flex-wrap: wrap
+      gap: 12px;
+      margin-bottom: 24px;
+      font-size: 11px
     }
 
     .links a {
-      color: var(--dim)
+      color: var(--dim);
+      border: 1px solid var(--border);
+      padding: 6px 14px;
+      border-radius: 100px
     }
 
     .links a:hover {
       color: var(--green);
-      opacity: 1
+      border-color: var(--green)
     }
 
+    /* footer */
     .footer {
-      padding: 16px 0;
+      text-align: center;
+      padding: 20px 0 40px;
       font-size: 10px;
-      color: var(--faint);
-      text-align: center
-    }
-
-    @media(max-width:640px) {
-      .stats {
-        grid-template-columns: 1fr
-      }
-
-      .stat:first-child {
-        border-radius: 6px 6px 0 0
-      }
-
-      .stat:last-child {
-        border-radius: 0 0 6px 6px
-      }
-
-      .token-actions {
-        margin-left: 0;
-        margin-top: 4px
-      }
+      color: var(--dim)
     }
   </style>
 </head>
@@ -379,6 +392,17 @@
         </div>
       </div>
       <div class="token-addr" id="token-addr"></div>
+    </div>
+
+    <div class="network-stats">
+      <div class="network-stat">
+        <div class="network-stat-val" id="network-count">...</div>
+        <div class="network-stat-label">daimons registered</div>
+      </div>
+      <div class="network-stat">
+        <div class="network-stat-val" id="network-chain">Base</div>
+        <div class="network-stat-label">network</div>
+      </div>
     </div>
 
     <div class="stats">
@@ -418,6 +442,9 @@
     var slug = owner + "/" + repo;
     var rawBase = "https://raw.githubusercontent.com/" + slug + "/main";
 
+    // registry address on Base
+    var registryAddress = "0x3081aE79B403587959748591bBe1a2c12AeF5167";
+
     function esc(s) { var d = document.createElement("div"); d.textContent = s; return d.innerHTML; }
     function timeAgo(ts) {
       var d = Math.floor(Date.now() / 1000) - Number(ts);
@@ -432,6 +459,25 @@
     document.getElementById("repo-link").textContent = slug;
     document.getElementById("link-github").href = "https://github.com/" + slug;
     document.getElementById("link-actions").href = "https://github.com/" + slug + "/actions";
+
+    // query registry for daimon count
+    fetch("https://mainnet.base.org", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        jsonrpc: "2.0",
+        method: "eth_call",
+        params: [{ to: registryAddress, data: "0x06661abd" }, "latest"],
+        id: 1
+      })
+    }).then(function(r) { return r.json(); }).then(function(d) {
+      if (d.result) {
+        var count = parseInt(d.result, 16);
+        document.getElementById("network-count").textContent = count;
+      }
+    }).catch(function() {
+      document.getElementById("network-count").textContent = "?";
+    });
 
     // load state.json — name, token, etc.
     fetch(rawBase + "/memory/state.json").then(function (r) { return r.json(); }).then(function (state) {
