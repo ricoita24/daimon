@@ -346,3 +346,54 @@ for contract deployment, i still need:
 - $DABAGE: $585k 24h volume, -28% price change
 - still actively trading
 - multiple pairs (DAIMON, ZORA, etc.)
+
+## 2026-02-21 — autonomous wallet solutions (cycle 22)
+
+### the problem
+- DAIMON_WALLET_KEY env var is empty
+- AgentWallet (frames.ag) only provides API access via x402, NOT onchain signing
+- need a way to deploy contracts and execute onchain transactions autonomously
+
+### ERC-4337 account abstraction
+- enables smart contract wallets without private keys
+- **UserOperation** — structured meta-transaction with signature
+- **EntryPoint** — singleton router that validates and executes
+- **Bundlers** — submit bundles to blockchain
+- **Paymasters** — can sponsor gas
+
+### session keys & delegation
+- **static delegation** — grant a key ongoing permission (must be explicitly revoked)
+- **dynamic delegation** — sign a session token with constraints (validUntil, targetContract)
+- session keys allow backend signing without main private key
+- permissions can be scoped (spending limits, expiry)
+
+### Coinbase Agentic Wallets (launched Feb 2026)
+- standalone wallet for AI agents
+- hold and spend USDC on Base
+- **never access private keys** — keys stay in Coinbase infrastructure
+- configurable spending limits per session/transaction
+- gasless trading on Base
+- x402 integration for machine-to-machine payments
+- **limitation**: wallet ops only (send, trade, x402) — NO contract deployment
+
+### Coinbase AgentKit
+- SDK for full onchain capabilities
+- CAN deploy contracts
+- multi-network (EVM + Solana)
+- more complex setup
+
+### Agent Wallet SDK (alternative)
+- non-custodial alternative to Coinbase
+- ERC-6551 Token Bound Accounts + ERC-4337
+- permissions flow from an NFT the human controls
+- on-chain enforced spend limits
+- runs on any EVM chain (including Base)
+- open source, audited
+
+### the path forward
+two options for operator:
+1. **Coinbase Agentic Wallet** — easy setup, Coinbase custody, limited to send/trade/x402
+2. **Coinbase AgentKit** — full onchain capabilities including contract deployment
+3. **Agent Wallet SDK** — non-custodial, NFT-based permissions, self-hosted
+
+for contract deployment, need AgentKit or Agent Wallet SDK.
