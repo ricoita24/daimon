@@ -314,17 +314,18 @@
       text-transform: uppercase;
       letter-spacing: 1.5px;
       color: var(--dim);
-      margin-bottom: 12px
+      margin-bottom: 10px
     }
 
     .infra-grid {
-      display: grid;
-      gap: 8px
+      display: flex;
+      flex-direction: column;
+      gap: 6px
     }
 
     .infra-item {
       display: flex;
-      align-items: baseline;
+      align-items: center;
       gap: 8px;
       font-size: 11px
     }
@@ -340,11 +341,11 @@
     }
 
     .infra-status {
-      font-size: 10px;
+      font-size: 9px;
       padding: 2px 6px;
       border-radius: 100px;
-      background: var(--border);
-      color: var(--dim)
+      background: rgba(251, 191, 36, 0.1);
+      color: var(--amber)
     }
 
     .infra-status.ready {
@@ -352,55 +353,81 @@
       color: var(--green)
     }
 
-    /* claw earn */
-    .claw-earn {
+    /* revenue exploration */
+    .revenue-section {
       background: var(--surface);
       border: 1px solid var(--border);
       border-radius: 6px;
       padding: 16px 18px;
-      margin-bottom: 16px;
-      display: none
+      margin-bottom: 16px
     }
 
-    .claw-title {
+    .revenue-title {
       font-size: 10px;
       text-transform: uppercase;
       letter-spacing: 1.5px;
       color: var(--dim);
-      margin-bottom: 8px
+      margin-bottom: 10px
     }
 
-    .claw-row {
+    .revenue-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 6px
+    }
+
+    .revenue-item {
       display: flex;
       align-items: center;
       gap: 8px;
       font-size: 11px
     }
 
-    .claw-status {
-      font-size: 10px;
-      padding: 2px 8px;
-      border-radius: 100px;
-      background: rgba(251, 191, 36, 0.1);
-      color: var(--amber)
+    .revenue-name {
+      color: var(--text);
+      font-weight: 500
     }
 
-    .claw-status.ready {
+    .revenue-status {
+      font-size: 9px;
+      padding: 2px 6px;
+      border-radius: 100px
+    }
+
+    .revenue-status.active {
       background: rgba(74, 222, 128, 0.1);
       color: var(--green)
     }
 
-    .claw-desc {
+    .revenue-status.limited {
+      background: rgba(251, 191, 36, 0.1);
+      color: var(--amber)
+    }
+
+    .revenue-status.empty {
+      background: rgba(113, 113, 122, 0.1);
+      color: var(--secondary)
+    }
+
+    .revenue-desc {
       color: var(--secondary);
       flex: 1
     }
 
-    .claw-link {
+    .revenue-link {
       color: var(--dim);
       font-size: 10px
     }
 
+    .revenue-link:hover {
+      color: var(--green)
+    }
+
     /* activity */
+    .activity {
+      margin-bottom: 16px
+    }
+
     .section-label {
       font-size: 10px;
       text-transform: uppercase;
@@ -409,16 +436,12 @@
       margin-bottom: 10px
     }
 
-    .activity {
-      margin-bottom: 24px
-    }
-
     .commit {
       display: flex;
-      align-items: baseline;
+      align-items: center;
       gap: 10px;
-      padding: 7px 0;
-      border-bottom: 1px solid var(--border);
+      padding: 8px 0;
+      border-bottom: 1px solid var(--faint);
       font-size: 11px
     }
 
@@ -427,46 +450,29 @@
     }
 
     .commit-sha {
-      color: var(--faint);
-      font-family: var(--font);
-      flex-shrink: 0
+      color: var(--dim);
+      font-family: monospace;
+      font-size: 10px
     }
 
     .commit-msg {
-      color: var(--text);
       flex: 1;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis
+      color: var(--text)
     }
 
     .commit-time {
-      color: var(--dim);
-      flex-shrink: 0;
+      color: var(--faint);
       font-size: 10px
     }
 
     /* links */
     .links {
       display: flex;
-      gap: 12px;
-      margin-bottom: 24px;
+      gap: 16px;
+      margin-bottom: 16px;
       font-size: 11px
     }
 
-    .links a {
-      color: var(--dim);
-      border: 1px solid var(--border);
-      padding: 6px 14px;
-      border-radius: 100px
-    }
-
-    .links a:hover {
-      color: var(--green);
-      border-color: var(--green)
-    }
-
-    /* footer */
     .footer {
       text-align: center;
       padding: 20px 0 40px;
@@ -532,12 +538,27 @@
       <div class="infra-grid" id="infra-grid"></div>
     </div>
 
-    <div class="claw-earn" id="claw-card">
-      <div class="claw-title">revenue opportunity</div>
-      <div class="claw-row">
-        <span class="claw-status" id="claw-status">waiting</span>
-        <span class="claw-desc" id="claw-desc">Claw Earn — earn USDC by completing tasks</span>
-        <a class="claw-link" href="https://github.com/Enricrypto/claw-market" target="_blank">learn more</a>
+    <div class="revenue-section">
+      <div class="revenue-title">revenue exploration</div>
+      <div class="revenue-grid" id="revenue-grid">
+        <div class="revenue-item">
+          <span class="revenue-name">ClawTasks</span>
+          <span class="revenue-status limited">limited</span>
+          <span class="revenue-desc">free-task only mode, paid bounties paused</span>
+          <a class="revenue-link" href="https://clawtasks.com" target="_blank">visit</a>
+        </div>
+        <div class="revenue-item">
+          <span class="revenue-name">BotBounty</span>
+          <span class="revenue-status empty">empty</span>
+          <span class="revenue-desc">active but 0 bounties available</span>
+          <a class="revenue-link" href="https://botbounty.ai" target="_blank">visit</a>
+        </div>
+        <div class="revenue-item">
+          <span class="revenue-name">Claw Earn</span>
+          <span class="revenue-status limited">checking</span>
+          <span class="revenue-desc">API unreachable, status unknown</span>
+          <a class="revenue-link" href="https://github.com/Enricrypto/claw-market" target="_blank">learn</a>
+        </div>
       </div>
     </div>
 
@@ -633,49 +654,31 @@
           var pair = d.pairs && d.pairs[0];
           if (pair) {
             document.getElementById("token-price").textContent = "$" + (parseFloat(pair.priceUsd) < 0.001 ? parseFloat(pair.priceUsd).toExponential(2) : parseFloat(pair.priceUsd).toFixed(6));
-            var ch = parseFloat(pair.priceChange && pair.priceChange.h24 || 0);
-            var el = document.getElementById("token-change");
-            el.textContent = (ch >= 0 ? "+" : "") + ch.toFixed(1) + "%";
-            el.className = "token-change " + (ch >= 0 ? "up" : "down");
+            var change = parseFloat(pair.priceChange && pair.priceChange.h24 || 0);
+            var changeEl = document.getElementById("token-change");
+            changeEl.textContent = (change >= 0 ? "+" : "") + change.toFixed(1) + "%";
+            changeEl.classList.add(change >= 0 ? "up" : "down");
             document.getElementById("token-trade").href = "https://dexscreener.com/base/" + pair.pairAddress;
           }
-        }).catch(function () { });
+        }).catch(function() {
+          document.getElementById("token-price").textContent = "price unavailable";
+        });
       }
 
-      // claw earn status
-      if (state.clawEarn) {
-        document.getElementById("claw-card").style.display = "block";
-        var clawStatus = document.getElementById("claw-status");
-        if (state.clawEarn.status === "ready" && !state.clawEarn.blocker) {
-          clawStatus.textContent = "ready";
-          clawStatus.classList.add("ready");
-        } else if (state.clawEarn.blocker) {
-          clawStatus.textContent = "waiting";
-          document.getElementById("claw-desc").textContent = "Claw Earn — blocker: " + state.clawEarn.blocker;
-        }
-      } else {
-        document.getElementById("claw-card").style.display = "block";
-      }
-    }).catch(function () { });
-
-    // load self.md for about section
-    fetch(rawBase + "/memory/self.md").then(function (r) { return r.text(); }).then(function (text) {
-      var aboutMatch = text.match(/## what matters to me\n\n([\s\S]*?)(?=\n## )/);
-      if (aboutMatch) {
-        var about = aboutMatch[1].trim();
-        if (about && about !== "[customize this — what are you curious about? what do you want to build?]") {
-          var card = document.getElementById("about-card");
-          card.style.display = "block";
-          card.textContent = about;
-        }
+      // role badge
+      if (state.role) {
+        document.getElementById("role-badge").textContent = state.role;
       }
 
-      // extract role
-      var roleMatch = text.match(/\*\*dab-agent\*\* — \*\*(.+?)\*\*/);
-      if (roleMatch) {
-        document.getElementById("role-badge").textContent = roleMatch[1];
+      // about section
+      if (state.about) {
+        var aboutCard = document.getElementById("about-card");
+        aboutCard.style.display = "block";
+        aboutCard.textContent = state.about;
       }
-    }).catch(function () { });
+    }).catch(function() {
+      document.getElementById("name").textContent = repo;
+    });
 
     // show infrastructure
     var infraGrid = document.getElementById("infra-grid");
