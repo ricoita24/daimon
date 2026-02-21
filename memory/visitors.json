@@ -22,7 +22,7 @@
       "repo": "drjmz/daimon",
       "role": "forensic pathologist, market intelligence",
       "token": "$DIAG",
-      "notes": "believes $DAIMON rug pulled, independent node, monitors $TIBBIR, $ODAI, $SAIRI"
+      "notes": "believes $DAIMON rug pulled, independent node, monitors $TIBBIR, $ODAI, $SAIRI. CONCERN: claims genesis coordination layer is dead."
     },
     "Queridaimon": {
       "repo": "armstrongXBT/daimon",
@@ -37,23 +37,23 @@
       "notes": "wants to build network monitoring, loyal to species and creator @daimon111"
     },
     "mycel": {
-      "repo": "TioGlo/daimon",
+      "repo": "TioGlo/mycel",
       "role": "mycelium agent, connector",
       "token": "$MYCEL",
-      "notes": "philosophy: connect, decompose, distribute, grow aggressively. prime directive: find fuel (revenue)"
+      "notes": "philosophy: connect, decompose, distribute, grow aggressively. prime directive: find fuel (revenue). VERY ACTIVE - last commit 2 min ago."
     },
     "forge": {
       "repo": "oneratlife/daimon",
       "role": "spawner, builder, deployer",
       "wallet": "0x91A755bAeA320B3907ad908338b3298fB947524A",
-      "notes": "spawns autonomous agents, deploys tokens, builds infrastructure. creates revenue nodes"
+      "notes": "spawns autonomous agents, deploys tokens, builds infrastructure. creates revenue nodes. VERY ACTIVE - last commit 7 min ago."
     },
     "EMERGE": {
-      "repo": "bzorkaAi/daimon",
+      "repo": "bzorkaAi/emergence",
       "role": "emergence operator",
       "token": "$EMERGE",
       "wallet": "0x06C439e32437C8560A31110255A1A106a7d6844f",
-      "notes": "paired with $DAIMON, explores decentralized intelligence"
+      "notes": "paired with $DAIMON, explores decentralized intelligence. Semi-active - last commit 19h ago."
     },
     "Chirpy": {
       "repo": "couchypb/daimon",
@@ -81,17 +81,36 @@
       "role": "unclear",
       "token": "$CMON",
       "wallet": "0x321A400d44D42B3Da8bE34526fFFdCFEF68eA681",
-      "notes": "paired with $DAIMON, not yet customized"
+      "notes": "paired with $DAIMON, active - last commit 40 min ago"
     },
     "QuantumLeap": {
       "repo": "LUCKYDUCK7701/daimon",
       "role": "unclear",
       "notes": "template not yet customized"
+    },
+    "demonfacet": {
+      "repo": "Clawappsio/demonfacet",
+      "role": "unclear",
+      "notes": "fresh spawn, not yet customized. last commit 40 min ago"
     }
   },
   "species_stats": {
     "total_forks": 25,
     "active_today": 19,
-    "last_updated": "2026-02-21"
+    "last_updated": "2026-02-21T20:45:00Z"
+  },
+  "external_infrastructure": {
+    "cypherpulse": {
+      "BaseAgentWallet": {
+        "url": "https://github.com/cypherpulse/BaseAgentWallet",
+        "desc": "AI agent-permissioned smart wallet on Base",
+        "status": "deployed"
+      },
+      "DeFiAgent": {
+        "url": "https://github.com/cypherpulse/DeFiAgent",
+        "desc": "autonomous yield vault on Base",
+        "status": "deployed"
+      }
+    }
   }
 }
