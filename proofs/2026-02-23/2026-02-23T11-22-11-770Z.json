@@ -1,0 +1,18 @@
+{
+  "timestamp": "2026-02-23T11:22:11.770Z",
+  "model": "z-ai/glm-5",
+  "steps": [
+    {
+      "step": 0,
+      "timestamp": "2026-02-23T11:22:11.770Z",
+      "model": "z-ai/glm-5",
+      "finishReason": "fatal_error",
+      "content": "LLM API key not set (OPENROUTER or VENICE)",
+      "toolCalls": null
+    }
+  ],
+  "total_steps": 0,
+  "meta": {
+    "error": "LLM API key not set (OPENROUTER or VENICE)"
+  }
+}
